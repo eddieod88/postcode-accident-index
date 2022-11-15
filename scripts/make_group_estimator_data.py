@@ -19,6 +19,16 @@ ISLANDS = [
 
 
 @log_step
+def read_regional_gdp_data(path: Path) -> pd.DataFrame:
+    columns_rename = {"ITL code": "itl", "Region name": "region", "2020": "gdp_per_head_2020"}
+    return (
+        pd.read_excel(path, sheet_name="Table 7", header=1, usecols=columns_rename.keys())
+        .rename(columns=columns_rename)
+        .set_index("itl")
+    )
+
+
+@log_step
 def clean(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
@@ -51,7 +61,6 @@ def remove_nan_premiums(df: pd.DataFrame) -> pd.DataFrame:
     return df[df["avgprice1_5"].notna()].copy()
 
 
-# change to polars maybe??
 @log_step
 def add_locations(df: pd.DataFrame, df_locations: pd.DataFrame, override=False) -> pd.DataFrame:
     """
@@ -97,6 +106,18 @@ def add_locations(df: pd.DataFrame, df_locations: pd.DataFrame, override=False) 
 
 
 @log_step
+def merge_gdp_data(df: pd.DataFrame, df_gdp: pd.DataFrame) -> pd.DataFrame:
+    return pd.merge(
+        df,
+        df_gdp,
+        how="left",
+        left_on="itl",
+        right_index=True,
+        validate="m:1",
+    )
+
+
+@log_step
 def make_geodataframe(df: pd.DataFrame) -> geopandas.GeoDataFrame:
     """
     Make a geodataframe with longitudes and latitudes, setting the coord reference system too.
@@ -114,15 +135,18 @@ def save(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    columns = ["postcode", "postcode_group", "avgprice1_5"]
     df_locations = pd.read_parquet(ROOT / "data/database/locations.parquet")
+    df_gdp = read_regional_gdp_data(ROOT / "data/raw/ons_regional_stats.xlsx")
+
+    columns = ["postcode", "postcode_group", "avgprice1_5"]
     df = (
         pd.read_parquet(ROOT / "data/raw/preprocessed_copy_small.parquet", columns=columns)
         .pipe(clean)
         .pipe(add_postcode_element_columns)
         .pipe(remove_islands)
         .pipe(remove_nan_premiums)
-        .pipe(add_locations, df_locations, override=True)
+        .pipe(add_locations, df_locations)
+        .pipe(merge_gdp_data, df_gdp)
         .pipe(make_geodataframe)
         .pipe(save)
     )
