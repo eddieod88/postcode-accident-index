@@ -1,0 +1,69 @@
+accident_features:
+- Road_Type
+- Pedestrian_Crossing-Human_Control
+- Pedestrian_Crossing-Physical_Facilities
+- Light_Conditions
+- Weather_Conditions
+#  - Road_Surface_Conditions   # Something wrong about None types
+- Special_Conditions_at_Site
+- Carriageway_Hazards
+- Urban_or_Rural_Area
+- Did_Police_Officer_Attend_Scene_of_Accident
+- Speed_limit  # potentially might want to turn into a categorical
+- 1st_Road_Class
+- Police_Force
+- Number_of_Vehicles
+- Number_of_Casualties
+# - Day_of_Week  # pointless
+additional_rollup_features: 
+- count
+response:  Accident_Risk_Index
+
+# Drop rows with these categories as the data is too sparse
+drop_categories:
+  Road_Type: 
+  - Slip road
+  - Unknown
+  Pedestrian_Crossing-Human_Control:
+  - Control by school crossing patrol
+  Pedestrian_Crossing-Physical_Facilities:
+  - Central refuge
+  - Footbridge or subway
+  Light_Conditions:
+  - 'Darkness: Street lights present but unlit'
+  Weather_Conditions:
+  - Fog or mist
+  - Unknown
+
+# Group together these feature values into another category
+group_categories:
+  Pedestrian_Crossing-Physical_Facilities:
+    name: non-junction pedestrian crossing
+    grouping:
+    - Zebra crossing
+    - non-junction pedestrian crossing
+  Weather_Conditions:
+    name: Snowing
+    grouping:
+    - Snowing with high winds
+    - Snowing without high winds
+  Special_Conditions_at_Site:
+    name: other
+    grouping:
+    - Auto traffic signal partly defective
+    - Auto traffic singal
+    - Mud
+    - Ol or diesel
+    - Permanent sign or marking defective or obscured
+    - Road surface defective
+  Carriageway_Hazards:  # Should try change to binary
+    name: object
+    grouping:
+    - Other object in carriageway
+    - Any animal (except a ridden horse
+    - Pedestrian in carriageway (not injured
+    - Involvement with previous accident
+    - Dislodged vehicle load in carriageway
+
+general:
+  random_seed: 1
