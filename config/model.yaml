@@ -67,3 +67,17 @@ group_categories:
 
 general:
   random_seed: 1
+
+hyperparams:
+  n_estimators: 100
+  max_depth: 10
+  min_samples_split: 0.01
+  n_jobs: -1
+
+evaluation:
+  metrics:
+  - r2
+  - mae
+  visualisations:
+    histplot:
+      bins: 100

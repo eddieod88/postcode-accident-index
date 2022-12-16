@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Dict, List
+import shutil
 
 import yaml
 import polars as pl
@@ -9,10 +10,14 @@ ROOT = Path(__file__).parents[2]
 
 
 class Config:
-    def __init__(self, path: Path = ROOT / "config/model.yaml"):
+    def __init__(self, path: Path = ROOT / "config/model.yaml", additional_save_paths: List[Path] = None):
         self.path = path
         with open(self.path) as config_file:
             self.config_dict = yaml.safe_load(config_file)
+        
+        if additional_save_paths is not None:
+            for save_path in additional_save_paths:
+               shutil.copy(self.path, save_path) 
 
     def __call__(self) -> Dict:
         return self.config_dict

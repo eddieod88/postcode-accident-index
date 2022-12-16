@@ -36,11 +36,26 @@ A postcode comes in and is checked against our existing mapping (postcode -> ran
 
 ...
 
+## Notes
+
+Modelling:
+- Prediction will take a mode category selector if we do not know the value of a categorical variable present
+
 ## TODO:
 
-- Try a better joining strategy for the postcode to pop & area datasets (ie a postcode fall back mechanism)... this may make some of the nearest road stats completely wrong though...
-- Prediction will take a mode category selector if we do not know the value of a categorical variable present
-- Got some prelim results in a neatish format.  Now need to look into the following:
+[X] Evaluation script:
+    - Takes in:
+        - a folder with:
+            - config (with model hyperparameters)
+            - predictions (y_true and y_pred) which have been saved due to the use of cross validations
+    - Process:
+        - generates outputs based on the config file (which metrics, which visualisations...)
+    - Outputs (in same folder as the config and model):
+        - metrics and visualisations. 
+[ ] dvc the training to evaluation together
+[ ] Got some prelim results in a neatish format.  Now need to look into the following:
     - would it be better if we make this a classification task as we can't predict the extreme values
     - try removing variables such as count?
     - try more simple regression modelling techniques
+
+[ ] Try a better joining strategy for the postcode to pop & area datasets (ie a postcode fall back mechanism)... this may make some of the nearest road stats completely wrong though...
